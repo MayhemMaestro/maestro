@@ -29,7 +29,7 @@ var serveCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		r := mux.NewRouter()
-		r.PathPrefix("/static").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./static"))))
+		r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./static"))))
 		//
 		r.HandleFunc("/chaos/tests/{chaosTest}", RunTest).Methods("POST")
 		// Extract path parameters
