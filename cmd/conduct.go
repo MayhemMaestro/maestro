@@ -51,6 +51,7 @@ var conductCmd = &cobra.Command{
 			zap.L().Info(fmt.Sprintf("Error getting address:%s", err))
 			return
 		}
+
 		listenAddress, err := rootCmd.Flags().GetString("address")
 		if err != nil {
 			zap.L().Info(fmt.Sprintf("Error getting address:%s", err))

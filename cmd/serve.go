@@ -23,6 +23,11 @@ type Options struct {
 	Version  string
 }
 
+type ChaosTest struct {
+	Component string
+	ChaosType string
+}
+
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
 	Use:   "serve",
@@ -69,7 +74,6 @@ func RunTest(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	// Check if there are enough elements in the args array
 	if len(intermediate.Args) >= 2 {
 		chaosTest = ChaosTest{
 			Component: intermediate.Args[0],
@@ -77,16 +81,10 @@ func RunTest(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
-	// Use the ChaosTest struct
 	fmt.Printf("%+v\n", chaosTest)
 
 	result := cmd.CheckList(chaosTest.Component, chaosTest.ChaosType)
 
 	fmt.Fprintf(w, "\n Result: %s", result)
 
-}
-
-type ChaosTest struct {
-	Component string
-	ChaosType string
 }
