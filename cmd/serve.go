@@ -10,7 +10,6 @@ import (
 	"log"
 	cmd "maestro/cmd/chaostests"
 	"net/http"
-	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
@@ -37,7 +36,11 @@ var serveCmd = &cobra.Command{
 		//
 		r.HandleFunc("/chaos/tests/{chaosTest}", RunTest).Methods("POST")
 
-		listenAddress := os.Getenv("MAESTRO_LISTEN_ADDRESS")
+		listenAddress, err := rootCmd.Flags().GetString("address")
+		if err != nil {
+			zap.L().Info(fmt.Sprintf("Error getting address:%s", err))
+			return
+		}
 		zap.L().Info(fmt.Sprintf("Starting on %s", listenAddress))
 		zap.L().Fatal(fmt.Sprint(http.ListenAndServe(listenAddress, r)))
 	},

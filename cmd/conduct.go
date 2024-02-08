@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -52,7 +51,11 @@ var conductCmd = &cobra.Command{
 			zap.L().Info(fmt.Sprintf("Error getting address:%s", err))
 			return
 		}
-		listenAddress := os.Getenv("MAESTRO_LISTEN_ADDRESS")
+		listenAddress, err := rootCmd.Flags().GetString("address")
+		if err != nil {
+			zap.L().Info(fmt.Sprintf("Error getting address:%s", err))
+			return
+		}
 
 		url := "http://" + listenAddress + "/chaos/tests/" + args[0]
 

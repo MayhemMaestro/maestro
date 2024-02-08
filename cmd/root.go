@@ -8,12 +8,13 @@ import (
 
 	"github.com/alecthomas/kingpin/v2"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 var (
-	address = kingpin.Flag("address", "The address and port for the server to listen to.").Envar("MAESTRO_LISTEN_ADDRESS").Default("0.0.0.0:8000").String()
+	//address = kingpin.Flag("address", "The address and port for the server to listen to.").Envar("MAESTRO_LISTEN_ADDRESS").Default("0.0.0.0:8000").String()
 
 	logLevel = kingpin.Flag("log-level", "Log level (debug, info, warn, error, fatal, panic)").Envar("MAESTRO_LOG_LEVEL").Default("info").String()
 
@@ -40,10 +41,13 @@ func Execute() {
 }
 
 func init() {
-	// rootCmd.PersistentFlags().String("address", "", "The address for the server to listen on. Example: 0.0.0.0:8080")
+	rootCmd.PersistentFlags().String("address", "0.0.0.0:8080", "The address for the server to listen on. Example: 0.0.0.0:8080")
 	zap.ReplaceGlobals(createLogger(logLevel))
 
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	viper.SetDefault("address", "0.0.0.0:8080")
+
+	viper.SetConfigType("env")
 }
 
 func createLogger(level *string) *zap.Logger {
