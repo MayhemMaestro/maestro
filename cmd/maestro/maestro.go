@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"fmt"
@@ -30,7 +30,7 @@ func init() {
 }
 
 func main() {
-	// Initialize Logrus logger
+	// Initialize Zap logger
 	r := mux.NewRouter()
 	r.PathPrefix("").Handler(http.StripPrefix(*urlBasePath, http.FileServer(http.Dir("./static"))))
 	zap.L().Info(fmt.Sprintf("Starting on %s", *address))
