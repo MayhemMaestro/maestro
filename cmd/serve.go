@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	cmd "maestro/cmd/chaostests"
 	"net/http"
 	"os"
 
@@ -46,6 +47,13 @@ func init() {
 func RunTest(w http.ResponseWriter, r *http.Request) {
 	// Extract path parameters
 	vars := mux.Vars(r)
+	fmt.Println(vars)
+	selectedTest := vars["chaosTest"]
 	// Respond with the extracted parameters
-	fmt.Fprintf(w, "You've requested the test: %s", vars["chaosTest"])
+	fmt.Fprintf(w, "You've requested the test: %s", selectedTest)
+
+	result := cmd.CheckList(selectedTest)
+
+	fmt.Fprintf(w, "Result: %s", result)
+
 }
