@@ -15,7 +15,7 @@ func CheckList(selectedComponent string, selectedChaosTest string) string {
 		}
 		return "No tests found for:" + selectedChaosTest
 
-	case "memory":
+	case "mem":
 		return mem.MemSaturation()
 	default:
 		return "No tests found for:" + selectedChaosTest

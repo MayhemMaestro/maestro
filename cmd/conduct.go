@@ -16,7 +16,7 @@ import (
 
 // conductCmd represents the conduct command
 var conductCmd = &cobra.Command{
-	Use:   "conduct",
+	Use:   "conduct [list]",
 	Short: "Initiates a new chaos test",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -27,11 +27,11 @@ var conductCmd = &cobra.Command{
 			return
 		}
 
-		if len(args) < 2 {
+		// if len(args) < 2 {
 
-			fmt.Println("Error: Please provide the name of the test type [e.g. 'saturation' or 'latency']")
-			return
-		}
+		// 	fmt.Println("Error: Please provide the name of the test type. Run --list to view all tests.")
+		// 	return
+		// }
 
 		data := map[string]interface{}{
 			"message": "maestro conduct called",
@@ -83,9 +83,26 @@ var conductCmd = &cobra.Command{
 	},
 }
 
+var conductSubCmd = &cobra.Command{
+	Use:   "list [cpu, mem]",
+	Short: "My subcommand",
+
+	Run: func(cmd *cobra.Command, args []string) {
+		if args[0] == "cpu" {
+			fmt.Printf("[saturation, latency]")
+		}
+		if args[0] == "mem" {
+			fmt.Printf("[oom, corruption]")
+		}
+	},
+}
+
 func init() {
 
 	rootCmd.AddCommand(conductCmd)
+	conductCmd.AddCommand(conductSubCmd)
+
+	conductCmd.SetArgs([]string{"list"})
 
 	// Here you will define your flags and configuration settings.
 
