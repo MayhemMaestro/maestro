@@ -32,7 +32,6 @@ var serveCmd = &cobra.Command{
 		r.PathPrefix("/static").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./static"))))
 		//
 		r.HandleFunc("/chaos/tests/{chaosTest}", RunTest).Methods("POST")
-		// Extract path parameters
 		listenAddress := os.Getenv("MAESTRO_LISTEN_ADDRESS")
 		zap.L().Info(fmt.Sprintf("Starting on %s", listenAddress))
 		zap.L().Fatal(fmt.Sprint(http.ListenAndServe(listenAddress, r)))
