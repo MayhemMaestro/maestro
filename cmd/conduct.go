@@ -22,6 +22,18 @@ var conductCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
+		if len(args) == 0 {
+
+			fmt.Println("Error: Please provide the name of the component to test [e.g. 'cpu' or 'mem']")
+			return
+		}
+
+		if len(args) < 2 {
+
+			fmt.Println("Error: Please provide the name of the test type [e.g. 'saturation' or 'latency']")
+			return
+		}
+
 		data := map[string]interface{}{
 			"message": "maestro conduct called",
 			"args":    args,
@@ -42,18 +54,7 @@ var conductCmd = &cobra.Command{
 		}
 		listenAddress := os.Getenv("MAESTRO_LISTEN_ADDRESS")
 
-		var url string
-
-		switch args[0] {
-		case "cpu":
-			url = "http://" + listenAddress + "/chaos/tests/cpu"
-
-		case "mem":
-			url = "http://" + listenAddress + "/chaos/tests/mem"
-
-		default:
-			url = "http://" + listenAddress + "/chaos/tests/help"
-		}
+		url := "http://" + listenAddress + "/chaos/tests/" + args[0]
 
 		req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 		if err != nil {
