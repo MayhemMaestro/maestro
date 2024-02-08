@@ -7,7 +7,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -33,13 +35,14 @@ var conductCmd = &cobra.Command{
 
 		// Create a new HTTP client
 		client := &http.Client{}
-		listenAddr, err := rootCmd.Flags().GetString("address")
 		if err != nil {
 			zap.L().Info(fmt.Sprintf("Error getting address:%s", err))
 			return
 		}
+		listenAddress := os.Getenv("MAESTRO_LISTEN_ADDRESS")
+
 		// Create a new HTTP POST request
-		req, err := http.NewRequest("POST", "http://"+listenAddr+"/chaos/tests/"+args[0], bytes.NewBuffer(jsonData))
+		req, err := http.NewRequest("POST", "http://"+listenAddress+"/chaos/tests/"+args[0], bytes.NewBuffer(jsonData))
 		if err != nil {
 			zap.L().Info(fmt.Sprintf("Error creating request:%s", err))
 			return
@@ -56,8 +59,9 @@ var conductCmd = &cobra.Command{
 		}
 		defer resp.Body.Close()
 
+		body, _ := io.ReadAll(resp.Body)
+		zap.L().Info(fmt.Sprintf("Response: %s", body))
 		// Print the response status code
-		zap.L().Info(fmt.Sprintf("Response status code: %d", resp.StatusCode))
 	},
 }
 
