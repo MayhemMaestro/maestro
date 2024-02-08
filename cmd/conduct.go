@@ -27,11 +27,11 @@ var conductCmd = &cobra.Command{
 			return
 		}
 
-		// if len(args) < 2 {
+		if len(args) < 2 {
 
-		// 	fmt.Println("Error: Please provide the name of the test type. Run --list to view all tests.")
-		// 	return
-		// }
+			fmt.Println("Error: Please provide the name of the test type. run 'list <component>' to view all tests for a component.")
+			return
+		}
 
 		data := map[string]interface{}{
 			"message": "maestro conduct called",
@@ -88,6 +88,13 @@ var conductSubCmd = &cobra.Command{
 	Short: "My subcommand",
 
 	Run: func(cmd *cobra.Command, args []string) {
+
+		if len(args) == 0 {
+
+			fmt.Println("All components: [cpu, mem, net]. Specify 'list  and then a component to view relevant tests")
+			return
+		}
+
 		if args[0] == "cpu" {
 			fmt.Printf("[saturation, latency]")
 		}
