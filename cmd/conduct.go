@@ -21,6 +21,7 @@ var conductCmd = &cobra.Command{
 	Short: "Initiates a new chaos test",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+
 		data := map[string]interface{}{
 			"message": "maestro conduct called",
 			"args":    args,
@@ -41,8 +42,20 @@ var conductCmd = &cobra.Command{
 		}
 		listenAddress := os.Getenv("MAESTRO_LISTEN_ADDRESS")
 
-		// Create a new HTTP POST request
-		req, err := http.NewRequest("POST", "http://"+listenAddress+"/chaos/tests/"+args[0], bytes.NewBuffer(jsonData))
+		var url string
+
+		switch args[0] {
+		case "cpu":
+			url = "http://" + listenAddress + "/chaos/tests/cpu"
+
+		case "mem":
+			url = "http://" + listenAddress + "/chaos/tests/mem"
+
+		default:
+			url = "http://" + listenAddress + "/chaos/tests/help"
+		}
+
+		req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 		if err != nil {
 			zap.L().Info(fmt.Sprintf("Error creating request:%s", err))
 			return
@@ -66,6 +79,7 @@ var conductCmd = &cobra.Command{
 }
 
 func init() {
+
 	rootCmd.AddCommand(conductCmd)
 
 	// Here you will define your flags and configuration settings.

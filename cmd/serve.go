@@ -4,7 +4,10 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
+	"log"
 	cmd "maestro/cmd/chaostests"
 	"net/http"
 	"os"
@@ -33,6 +36,7 @@ var serveCmd = &cobra.Command{
 		r.PathPrefix("/static").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./static"))))
 		//
 		r.HandleFunc("/chaos/tests/{chaosTest}", RunTest).Methods("POST")
+
 		listenAddress := os.Getenv("MAESTRO_LISTEN_ADDRESS")
 		zap.L().Info(fmt.Sprintf("Starting on %s", listenAddress))
 		zap.L().Fatal(fmt.Sprint(http.ListenAndServe(listenAddress, r)))
@@ -45,15 +49,41 @@ func init() {
 }
 
 func RunTest(w http.ResponseWriter, r *http.Request) {
-	// Extract path parameters
-	vars := mux.Vars(r)
-	fmt.Println(vars)
-	selectedTest := vars["chaosTest"]
-	// Respond with the extracted parameters
-	fmt.Fprintf(w, "You've requested the test: %s", selectedTest)
 
-	result := cmd.CheckList(selectedTest)
+	var chaosTest ChaosTest
+	bodyBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Error reading request body", http.StatusInternalServerError)
+		return
+	}
 
-	fmt.Fprintf(w, "Result: %s", result)
+	var intermediate struct {
+		Args []string `json:"args"`
+	}
 
+	err = json.Unmarshal(bodyBytes, &intermediate)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Check if there are enough elements in the args array
+	if len(intermediate.Args) >= 2 {
+		chaosTest = ChaosTest{
+			Component: intermediate.Args[0],
+			ChaosType: intermediate.Args[1],
+		}
+
+	}
+	// Use the ChaosTest struct
+	fmt.Printf("%+v\n", chaosTest)
+
+	result := cmd.CheckList(chaosTest.Component, chaosTest.ChaosType)
+
+	fmt.Fprintf(w, "\n Result: %s", result)
+
+}
+
+type ChaosTest struct {
+	Component string
+	ChaosType string
 }
