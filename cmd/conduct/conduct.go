@@ -1,6 +1,3 @@
-/*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -14,8 +11,8 @@ import (
 	"go.uber.org/zap"
 )
 
-// conductCmd represents the conduct command
-var conductCmd = &cobra.Command{
+// ConductCmd represents the conduct command
+var ConductCmd = &cobra.Command{
 	Use:   "conduct [list]",
 	Short: "Initiates a new chaos test",
 	Long:  ``,
@@ -52,13 +49,12 @@ var conductCmd = &cobra.Command{
 			return
 		}
 
-		listenAddress, err := rootCmd.Flags().GetString("address")
 		if err != nil {
 			zap.L().Info(fmt.Sprintf("Error getting address:%s", err))
 			return
 		}
 
-		url := "http://" + listenAddress + "/chaos/tests/" + args[0]
+		url := "http://" + "listenAddress" + "/chaos/tests/" + args[0]
 
 		req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 		if err != nil {
@@ -77,9 +73,11 @@ var conductCmd = &cobra.Command{
 		}
 		defer resp.Body.Close()
 
-		body, _ := io.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			zap.L().Error("Error reading response", zap.Error(err))
+		}
 		zap.L().Info(fmt.Sprintf("Response: %s", body))
-		// Print the response status code
 	},
 }
 
@@ -105,19 +103,17 @@ var conductSubCmd = &cobra.Command{
 }
 
 func init() {
+	ConductCmd.AddCommand(conductSubCmd)
 
-	rootCmd.AddCommand(conductCmd)
-	conductCmd.AddCommand(conductSubCmd)
-
-	conductCmd.SetArgs([]string{"list"})
+	ConductCmd.SetArgs([]string{"list"})
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// conductCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// ConductCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// conductCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// ConductCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
