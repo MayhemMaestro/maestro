@@ -1,8 +1,8 @@
-package cmd
+package chaostests
 
 import (
-	cpu "maestro/cmd/chaostests/cpuTests"
-	mem "maestro/cmd/chaostests/memTests"
+	cpu "github.com/MayhemMaestro/maestro/chaostests/cpuTests"
+	mem "github.com/MayhemMaestro/maestro/chaostests/memTests"
 )
 
 // Takes user input to run a test

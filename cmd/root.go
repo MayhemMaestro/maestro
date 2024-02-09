@@ -1,24 +1,15 @@
-/*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
+	"fmt"
 	"os"
 
-	"github.com/alecthomas/kingpin/v2"
+	conduct "github.com/MayhemMaestro/maestro/cmd/conduct"
+	serve "github.com/MayhemMaestro/maestro/cmd/serve"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-)
-
-var (
-	//address = kingpin.Flag("address", "The address and port for the server to listen to.").Envar("MAESTRO_LISTEN_ADDRESS").Default("0.0.0.0:8000").String()
-
-	logLevel = kingpin.Flag("log-level", "Log level (debug, info, warn, error, fatal, panic)").Envar("MAESTRO_LOG_LEVEL").Default("info").String()
-
-	// urlBasePath = kingpin.Flag("url-base-path", "The base URL to run Coroot at a sub-path, e.g. /base/").Envar("MAESTRO_URL_BASE_PATH").Default("/").String()
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -41,18 +32,33 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().String("address", "0.0.0.0:8080", "The address for the server to listen on. Example: 0.0.0.0:8080")
-	zap.ReplaceGlobals(createLogger(logLevel))
+	cobra.OnInitialize(createLogger)
+	rootCmd.PersistentFlags().String("log-level", "info", "The log level (debug, info, warn, error, fatal, panic)")
+	rootCmd.PersistentFlags().String("encoding", "json", "The zap encoding to use (json or console)")
 
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	viper.SetDefault("address", "0.0.0.0:8080")
+	viper.SetDefault("log-level", "info")
 
 	viper.SetConfigType("env")
+	rootCmd.AddCommand(serve.ServeCmd)
+	rootCmd.AddCommand(conduct.ConductCmd)
+
 }
 
-func createLogger(level *string) *zap.Logger {
+func createLogger() {
 	var zapLevel zapcore.Level
-	switch *level {
+
+	level, err := rootCmd.Flags().GetString("log-level")
+	if err != nil {
+		fmt.Println(err.Error())
+		zap.L().Fatal("Failed to read listen log level", zap.Error(err))
+	}
+	encoding, err := rootCmd.Flags().GetString("encoding")
+	if err != nil {
+		fmt.Println(err.Error())
+		zap.L().Fatal("Failed to read listen log level", zap.Error(err))
+	}
+	switch level {
 	case "debug":
 		zapLevel = zap.DebugLevel
 	case "info":
@@ -78,15 +84,16 @@ func createLogger(level *string) *zap.Logger {
 		DisableCaller:     false,
 		DisableStacktrace: false,
 		Sampling:          nil,
-		Encoding:          "json",
+		Encoding:          encoding,
 		EncoderConfig:     encoderCfg,
 		OutputPaths: []string{
-			"stderr",
+			"stdout",
 		},
 		ErrorOutputPaths: []string{
 			"stderr",
 		},
 	}
 
-	return zap.Must(config.Build())
+	logger := zap.Must(config.Build())
+	zap.ReplaceGlobals(logger)
 }
