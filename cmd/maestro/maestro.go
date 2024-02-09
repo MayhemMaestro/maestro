@@ -34,7 +34,10 @@ func main() {
 	r := mux.NewRouter()
 	r.PathPrefix("").Handler(http.StripPrefix(*urlBasePath, http.FileServer(http.Dir("./static"))))
 	zap.L().Info(fmt.Sprintf("Starting on %s", *address))
-	zap.L().Fatal(fmt.Sprint(http.ListenAndServe(*address, r)))
+	zap.L().Fatal(
+		"Failed to start server",
+		zap.Error(http.ListenAndServe(*address, r)),
+	)
 }
 
 func createLogger(level *string) *zap.Logger {
