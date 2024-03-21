@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -54,7 +55,9 @@ var ConductCmd = &cobra.Command{
 			return
 		}
 
-		url := "http://" + "listenAddress" + "/chaos/tests/" + args[0]
+		address := os.Getenv("MAESTRO_LISTEN_ADDRESS")
+
+		url := "http://" + address + "/chaos/tests/" + args[0]
 
 		req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 		if err != nil {
@@ -77,7 +80,8 @@ var ConductCmd = &cobra.Command{
 		if err != nil {
 			zap.L().Error("Error reading response", zap.Error(err))
 		}
-		zap.L().Info(fmt.Sprintf("Response: %s", body))
+
+		zap.L().Info(fmt.Sprintf("Response from url: %s, %s", url, body))
 	},
 }
 

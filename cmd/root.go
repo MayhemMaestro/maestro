@@ -36,7 +36,8 @@ func init() {
 	rootCmd.PersistentFlags().String("log-level", "info", "The log level (debug, info, warn, error, fatal, panic)")
 	rootCmd.PersistentFlags().String("encoding", "json", "The zap encoding to use (json or console)")
 
-	viper.SetDefault("address", "0.0.0.0:8080")
+	viper.SetDefault("address", "localhost:8080")
+	viper.SetDefault("envAddress", os.Getenv("MAESTRO_LISTEN_ADDRESS"))
 	viper.SetDefault("log-level", "info")
 
 	viper.SetConfigType("env")
